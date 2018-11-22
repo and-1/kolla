@@ -1,0 +1,128 @@
+{% extends parent_template %}
+
+# ceph-mon
+{% set ceph_base_packages_append = ['ipcalc'] %}
+{% block ceph_base_footer %}
+RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl -o /bin/kubectl && chmod +x /bin/kubectl
+{% endblock %}
+
+# rabbitmq
+### Install 3.7 version instead 3.6
+{% block rabbitmq_header %}
+RUN curl -s 'https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc' | sudo apt-key add -
+RUN echo 'deb http://dl.bintray.com/rabbitmq/debian xenial main erlang-20.x' > /etc/apt/sources.list.d/rabbit.list
+{% endblock %}
+{% set rabbitmq_packages_override = [
+   'erlang-nox',
+   'logrotate',
+   'rabbitmq-server',
+   'erlang-base-hipe'
+   ] %}
+{% block rabbitmq_install_plugins %}
+### delete content in this block
+{% endblock %}
+{% block rabbitmq_footer %}
+RUN curl -Lo /docker-entrypoint.sh https://raw.githubusercontent.com/docker-library/rabbitmq/master/3.7/docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
+RUN curl -Lo /usr/sbin/rabbitmqadmin https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/v3.7.7/bin/rabbitmqadmin && chmod +x /usr/sbin/rabbitmqadmin
+ENV LANG=en_US.UTF-8
+RUN /usr/lib/rabbitmq/bin/rabbitmq-plugins enable --offline rabbitmq_management
+{% endblock %}
+
+# cinder
+{% block cinder_api_footer %}
+# Backward compatibility for cinder-api. Now execute through wsgi
+RUN echo '[ -f /etc/apache2/envvars ] && source /etc/apache2/envvars \n\
+          exec apache2 -DFOREGROUND' > /usr/bin/cinder-api &&\
+    chmod +x /usr/bin/cinder-api && \
+    chown cinder -R /var/log/apache2 /var/run/apache2 &&\
+    chmod 777 -R /var/log/apache2
+{% endblock %}
+
+# nova-api
+{% set nova_api_packages_remove = ['nova-api'] %}
+{% set nova_api_packages_append = ['nova-api-metadata', 'nova-api-os-compute'] %}
+
+# horizon
+{% block horizon_footer %}
+RUN rm -rf /usr/lib/python2.7/site-packages/openstack_dashboard && ln -s /usr/share/openstack-dashboard/openstack_dashboard /usr/lib/python2.7/site-packages/openstack_dashboard 
+### Workaround for delete auto enabled plugin
+RUN for i in 'python-designate-dashboard' 'python-heat-dashboard' 'python-manila-ui' 'python-murano-dashboard' 'python-neutron-lbaas-dashboard' 'python-sahara-dashboard' 'python-trove-dashboard'; \
+    do dpkg -L $i | grep '/usr/share/openstack-dashboard/openstack_dashboard/enabled/' | xargs -I{} rm -f {} {}c;done
+{% endblock %}
+
+# gnocchi
+{% set gnocchi_base_packages_remove = [ 'gnocchi-common' ] %}
+{% set gnocchi_base_packages_append = [ 'python-keystonemiddleware' ] %}
+{% set gnocchi_base_pip_packages_append = [ 'gnocchi', 'oslo.db', 'gnocchiclient', 'sqlalchemy-utils' ] %}
+
+# elasticsearch
+### Install 5.x version instead 2.x by default
+{% block elasticsearch_header %}
+RUN curl -s -L 'https://artifacts.elastic.co/GPG-KEY-elasticsearch' | sudo apt-key add -
+RUN echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+{% endblock %}
+### Install s3 plugin
+{% block elasticsearch_footer %}
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install repository-s3
+ENV GOSU_VERSION=1.10
+RUN curl -s -L -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)"  &&\
+    curl -s -L -o /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc"  &&\
+    export GNUPGHOME="$(mktemp -d)"  && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4  &&\
+    gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc  && chmod +x /usr/local/bin/gosu  && gosu nobody true 
+WORKDIR /usr/share/elasticsearch
+# Entrypoint script
+RUN echo '#!/bin/bash \n\
+export PATH=$PATH:$(pwd)/bin \n\
+set -e \n\
+if [ "${1:0:1}" = "-" ]; then \n\
+        set -- elasticsearch "$@" \n\
+fi \n\
+if [ "$1" = "elasticsearch" -a "$(id -u)" = "0" ]; then \n\
+        for path in /usr/share/elasticsearch/data /usr/share/elasticsearch/logs; do \n\
+              chown -R elasticsearch:elasticsearch "$path" \n\
+        done \n\
+        set -- gosu elasticsearch "$@" \n\
+fi \n\
+exec "$@"' > /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
+# End
+{% endblock %}
+
+# Kubernetes-entrypoint
+### Change version
+{% block kubernetes_entrypoint_install_binary %}
+RUN curl -Lo /usr/local/bin/kubernetes-entrypoint https://github.com/stackanetes/kubernetes-entrypoint/releases/download/v0.3.0/kubernetes-entrypoint \
+     && chmod 755 /usr/local/bin/kubernetes-entrypoint
+{% endblock %}
+
+# Prometheus
+##Server
+{% block prometheus_server_repository_version %}
+ENV prometheus_version=2.3.2
+{% endblock %}
+{% block prometheus_server_footer %}
+RUN rm -f /bin/sh && ln -s /bin/bash /bin/sh && ln -s /opt/prometheus/prometheus /bin/prometheus
+{% endblock %}
+##AlertManager
+{% block prometheus_alertmanager_footer %}
+RUN rm -f /bin/sh && ln -s /bin/bash /bin/sh && ln -s /opt/prometheus_alertmanager/alertmanager /bin/alertmanager
+{% endblock %}
+##Node-exporter
+{% block node_exporter_repository_version %}
+ENV node_exporter_version=0.15.0
+{% endblock %}
+{% block node_exporter_footer %}
+RUN rm -f /bin/sh && ln -s /bin/bash /bin/sh && ln -s /opt/node_exporter/node_exporter /bin/node_exporter
+{% endblock %}
+##Mysql-exporter
+{% block mysqld_exporter_footer %}
+RUN rm -f /bin/sh && ln -s /bin/bash /bin/sh && ln -s /opt/mysqld_exporter/mysqld_exporter /bin/mysqld_exporter
+{% endblock %}
+
+# Kibana
+{% block kibana_header %}
+RUN curl -s -L 'https://artifacts.elastic.co/GPG-KEY-elasticsearch' | sudo apt-key add -
+RUN echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+{% endblock %}
+{% block kibana_footer %}
+RUN ln -s /usr/share/kibana/bin/kibana /bin/kibana
+{% endblock %}
