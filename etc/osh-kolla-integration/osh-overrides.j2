@@ -38,6 +38,9 @@ RUN echo '[ -f /etc/apache2/envvars ] && source /etc/apache2/envvars \n\
     chmod 777 -R /var/log/apache2
 {% endblock %}
 
+# libvirt
+{% set nova_libvirt_packages_append = ['cgroup-tools'] %}
+
 # nova-api
 {% set nova_api_packages_remove = ['nova-api'] %}
 {% set nova_api_packages_append = ['nova-api-metadata', 'nova-api-os-compute'] %}
