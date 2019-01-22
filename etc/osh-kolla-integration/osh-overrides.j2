@@ -1,10 +1,11 @@
 {% extends parent_template %}
 
-# ceph-mon
-{% set ceph_base_packages_append = ['ipcalc'] %}
+# ceph-mon,ceph-rgw
+{% set ceph_base_packages_append = ['ipcalc','s3cmd'] %}
 {% block ceph_base_footer %}
-RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl -o /bin/kubectl && chmod +x /bin/kubectl
+RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl -o /bin/kubectl && chmod +x /bin/kubectl
 {% endblock %}
+
 
 # rabbitmq
 ### Install 3.7 version instead 3.6
@@ -73,7 +74,7 @@ RUN curl -s -L -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/d
     export GNUPGHOME="$(mktemp -d)"  && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4  &&\
     gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc  && chmod +x /usr/local/bin/gosu  && gosu nobody true 
 WORKDIR /usr/share/elasticsearch
-# Entrypoint script
+### Entrypoint script
 RUN echo '#!/bin/bash \n\
 export PATH=$PATH:$(pwd)/bin \n\
 set -e \n\
@@ -87,7 +88,7 @@ if [ "$1" = "elasticsearch" -a "$(id -u)" = "0" ]; then \n\
         set -- gosu elasticsearch "$@" \n\
 fi \n\
 exec "$@"' > /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
-# End
+### End
 {% endblock %}
 
 # Kubernetes-entrypoint
