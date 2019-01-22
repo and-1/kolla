@@ -74,7 +74,6 @@ RUN curl -s -L -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/d
     gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc  && chmod +x /usr/local/bin/gosu  && gosu nobody true 
 WORKDIR /usr/share/elasticsearch
 ### Entrypoint script
->>>>>>> e7a8726d1266ec11cf035c561c346c4dc444ab68
 RUN echo '#!/bin/bash \n\
 export PATH=$PATH:$(pwd)/bin \n\
 set -e \n\
