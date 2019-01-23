@@ -1,9 +1,14 @@
 {% extends parent_template %}
 
-# ceph-mon,ceph-rgw
+# ceph-base
 {% set ceph_base_packages_append = ['ipcalc','s3cmd'] %}
 {% block ceph_base_footer %}
 RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl -o /bin/kubectl && chmod +x /bin/kubectl
+{% endblock %}
+
+# ceph-rgw
+{% block ceph_rgw_header %}
+RUN echo 'host_base = localhost\nhost_bucket = localhost\nuse_https = False' > /root/.s3cfg
 {% endblock %}
 
 # rabbitmq
