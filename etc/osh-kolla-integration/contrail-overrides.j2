@@ -1,0 +1,39 @@
+{% extends parent_template %}
+
+#Patch until resolve issue https://bugs.launchpad.net/opencontrail/+bug/1781968
+## contrail_controller_config_api
+{% block contrail_controller_config_api_header %}
+RUN curl -L http://mirror.centos.org/centos/7/os/x86_64/Packages/patch-2.7.1-10.el7_5.x86_64.rpm -o /tmp/patch.rpm && rpm -i /tmp/patch.rpm &&\
+    curl -L -o /tmp/vnc_cfg_api_server_utils.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_cfg_api_server_utils.patch &&\
+    curl -L -o /tmp/vnc_openstack__init__.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_openstack__init__.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_cfg_api_server/utils.py /tmp/vnc_cfg_api_server_utils.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_openstack/__init__.py /tmp/vnc_openstack__init__.patch &&\
+    rpm -e patch
+{% endblock %}
+## contrail_controller_config_devicemgr
+{% block contrail_controller_config_devicemgr_header %}
+RUN curl -L http://mirror.centos.org/centos/7/os/x86_64/Packages/patch-2.7.1-10.el7_5.x86_64.rpm -o /tmp/patch.rpm && rpm -i /tmp/patch.rpm &&\
+    curl -L -o /tmp/vnc_cfg_api_server_utils.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_cfg_api_server_utils.patch &&\
+    curl -L -o /tmp/vnc_openstack__init__.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_openstack__init__.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_cfg_api_server/utils.py /tmp/vnc_cfg_api_server_utils.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_openstack/__init__.py /tmp/vnc_openstack__init__.patch &&\
+    rpm -e patch
+{% endblock %}
+## contrail_controller_config_schema
+{% block contrail_controller_config_schema_header %}
+RUN curl -L http://mirror.centos.org/centos/7/os/x86_64/Packages/patch-2.7.1-10.el7_5.x86_64.rpm -o /tmp/patch.rpm && rpm -i /tmp/patch.rpm &&\
+    curl -L -o /tmp/vnc_cfg_api_server_utils.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_cfg_api_server_utils.patch &&\
+    curl -L -o /tmp/vnc_openstack__init__.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_openstack__init__.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_cfg_api_server/utils.py /tmp/vnc_cfg_api_server_utils.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_openstack/__init__.py /tmp/vnc_openstack__init__.patch &&\
+    rpm -e patch
+{% endblock %}
+## contrail_controller_config_svcmonitor
+{% block contrail_controller_config_svcmonitor_header %}
+RUN curl -L http://mirror.centos.org/centos/7/os/x86_64/Packages/patch-2.7.1-10.el7_5.x86_64.rpm -o /tmp/patch.rpm && rpm -i /tmp/patch.rpm &&\
+    curl -L -o /tmp/vnc_cfg_api_server_utils.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_cfg_api_server_utils.patch &&\
+    curl -L -o /tmp/vnc_openstack__init__.patch https://raw.githubusercontent.com/and-1/kolla/stable/queens/etc/osh-kolla-integration/contrail_patchs/vnc_openstack__init__.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_cfg_api_server/utils.py /tmp/vnc_cfg_api_server_utils.patch &&\
+    patch /usr/lib/python2.7/site-packages/vnc_openstack/__init__.py /tmp/vnc_openstack__init__.patch &&\
+    rpm -e patch
+{% endblock %}

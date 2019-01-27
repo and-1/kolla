@@ -1,0 +1,18 @@
+--- a/src/config/api-server/vnc_cfg_api_server/utils.py
++++ b/src/config/api-server/vnc_cfg_api_server/utils.py
+@@ -74,7 +74,6 @@
+         'cluster_id': '',
+         'max_requests': 1024,
+         'paginate_count': 256,
+-        'region_name': 'RegionOne',
+         'stale_lock_seconds': '5', # lock but no resource past this => stale
+         'cloud_admin_role': cfgm_common.CLOUD_ADMIN_ROLE,
+         'global_read_only_role': cfgm_common.GLOBAL_READ_ONLY_ROLE,
+@@ -114,6 +113,7 @@
+         'keyfile': '',
+         'auth_type': 'password',
+         'auth_url': '',
++        'region_name': 'RegionOne',
+     }
+     # cassandra options
+     cassandraopts = {
