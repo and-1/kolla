@@ -134,7 +134,3 @@ RUN echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo 
 {% block kibana_footer %}
 RUN ln -s /usr/share/kibana/bin/kibana /bin/kibana
 {% endblock %}
-
-{% block contrail_header %}
-{%set contrail_tag = 'queens-master-454' %}
-{% endblock %}
