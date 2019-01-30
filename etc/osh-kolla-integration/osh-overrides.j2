@@ -62,6 +62,10 @@ RUN for i in 'python-designate-dashboard' 'python-heat-dashboard' 'python-manila
 {% set gnocchi_base_packages_remove = [ 'gnocchi-common' ] %}
 {% set gnocchi_base_packages_append = [ 'python-keystonemiddleware' ] %}
 {% set gnocchi_base_pip_packages_append = [ 'gnocchi', 'oslo.db', 'gnocchiclient', 'sqlalchemy-utils' ] %}
+# Fix issue 'ImportError: cannot import name deploy'
+{% block gnocchi_base_footer %}
+RUN pip install --upgrade --force-reinstall paste pastedeploy
+{% endblock %}
 
 # elasticsearch
 ### Install 5.x version instead 2.x by default
