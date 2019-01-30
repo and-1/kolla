@@ -27,7 +27,7 @@ RUN echo 'deb http://dl.bintray.com/rabbitmq/debian xenial main erlang-20.x' > /
 ### delete content in this block
 {% endblock %}
 {% block rabbitmq_footer %}
-RUN curl -Lo /docker-entrypoint.sh https://raw.githubusercontent.com/docker-library/rabbitmq/master/3.7/docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
+RUN curl -Lo /docker-entrypoint.sh https://raw.githubusercontent.com/docker-library/rabbitmq/master/3.7/ubuntu/docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
 RUN curl -Lo /usr/sbin/rabbitmqadmin https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/v3.7.7/bin/rabbitmqadmin && chmod +x /usr/sbin/rabbitmqadmin
 ENV LANG=en_US.UTF-8
 RUN /usr/lib/rabbitmq/bin/rabbitmq-plugins enable --offline rabbitmq_management
