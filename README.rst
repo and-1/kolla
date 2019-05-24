@@ -200,3 +200,25 @@ Notices
 Docker and the Docker logo are trademarks or registered trademarks of
 Docker, Inc. in the United States and/or other countries. Docker, Inc.
 and other parties may also have trademark rights in other terms used herein.
+
+TIPS
+====
+
+To build images for openstack-contrail project use follow tips
+
+- Build images for osh
+
+    ./tools/build.py --config-file etc/osh-kolla-integration/kolla-build.conf
+
+  Don't forget change registry url and tag in kolla-build.conf if required
+- Build TungstenFubric images
+
+    ./tools/build.py --config-file etc/osh-kolla-integration/kolla-build-contrail.conf
+
+  Don't forget change registry url and tag in kolla-build-contrail.conf if required
+
+- Libvirt image in queens release contain `BUG <https://bugs.launchpad.net/charm-nova-compute/+bug/1771662>`__. As workaround build libvirt in stable/rocky branch
+
+    git checkout stable/rocky
+
+    ./tools/build.py --registry <registry_url> --base ubuntu --base-tag 18.04 --namespace queens --push --tag rocky nova-libvirt
